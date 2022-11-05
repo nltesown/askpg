@@ -1,0 +1,19 @@
+/* @import "fonts/ibm-plex-sans.css";
+@import "fonts/inter.css"; */
+@import 'reset.css';
+
+body {
+	position: relative;
+	/* font-family: 'IBM Plex Sans', sans-serif; */
+}
+
+a {
+	text-decoration: none;
+	color: inherit;
+}
+
+ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
