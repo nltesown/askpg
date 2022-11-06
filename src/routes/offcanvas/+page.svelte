@@ -1,8 +1,21 @@
 <script>
 	import OffCanvas from '$lib/components/OffCanvas.svelte';
+	import Menu from '$lib/components/icons/IconMenu.svelte';
+	import Close from '$lib/components/icons/IconClose.svelte';
 
 	let open = true;
-	let color = '#ccc';
+	let color = null;
+	// let color = '#ccc';
+
+	let openSecondary = true;
+
+	function toggle() {
+		open = !open;
+	}
+
+	function toggleSecondary() {
+		openSecondary = !openSecondary;
+	}
 </script>
 
 <div class="container">
@@ -12,29 +25,67 @@
 		}}
 		{open}
 		--bg-color={color}
-		--transition="0.5s ease-in-out"
+		--transition="0.2s ease-in-out"
 	>
-		<div class="offcanvas" slot="offcanvas">The menu</div>
+		<div class="offcanvas" slot="offcanvas">
+			<p>The menu</p>
+		</div>
 		<main class="content" slot="content">
-			<h1>The content</h1>
-			<p>
-				Il est même possible de mettre ici du code qui modifie la valeur des props passés au
-				component.
-			</p>
-			<button
-				data-prevent-auto-close="true"
-				on:click={() => {
-					open = !open;
-				}}>Toggle</button
-			>
-			<button
-				data-prevent-auto-close="true"
-				on:click={() => {
-					color = color === 'blue' ? 'red' : 'blue';
-				}}>Color</button
-			>
+			<article>
+				<h1>The content</h1>
+				<p>
+					Il est même possible de mettre ici du code qui modifie la valeur des props passés au
+					component.
+				</p>
+				<button data-prevent-auto-close="true" on:click={toggle}>Open/close menu</button>
+				<button
+					data-prevent-auto-close="true"
+					on:click={() => {
+						color = color === 'blue' ? 'red' : 'blue';
+					}}>Change color</button
+				>
+
+				<div data-prevent-auto-close="true" class="inner-container">
+					<OffCanvas
+						on:change={(e) => {
+							openSecondary = e.detail.open;
+						}}
+						open={openSecondary}
+						--bg-color="pink"
+					>
+						<div slot="offcanvas">
+							<h2>What's here ?</h2>
+							<p>An apple.</p>
+							<p>A baby.</p>
+							<p>A carrot.</p>
+							<p>A deer.</p>
+							<p>An eiderdown.</p>
+							<p>A fag.</p>
+							<p>A gun.</p>
+							<p>A heart.</p>
+							<p>An idea.</p>
+							<p>A jug.</p>
+							<p>A keg.</p>
+							<p>A log.</p>
+							<p>A mug.</p>
+							<p>A noise.</p>
+							<p>An omelette.</p>
+						</div>
+						<div slot="content">About us.</div>
+					</OffCanvas>
+				</div>
+
+				<button data-prevent-auto-close="true" on:click={toggleSecondary}
+					>Open/close secondary menu</button
+				>
+			</article>
 		</main>
 	</OffCanvas>
+
+	<div class="menu-ctrl" on:click={toggle}>
+		{#if open === true}
+			<Close />{:else}<Menu />{/if}
+	</div>
 </div>
 
 <style>
@@ -62,6 +113,28 @@
 	}
 
 	.offcanvas {
-		padding: 12px;
+		padding: 36px 12px;
+		height: 2000px;
+	}
+
+	.menu-ctrl {
+		position: fixed;
+		top: 4px;
+		left: 4px;
+		width: 36px;
+		z-index: 1000;
+		cursor: pointer;
+	}
+
+	article {
+		width: 100%;
+		max-width: 700px;
+		margin: 24px auto;
+	}
+
+	.inner-container {
+		margin: 24px;
+		height: 300px;
+		background-color: #9cf;
 	}
 </style>

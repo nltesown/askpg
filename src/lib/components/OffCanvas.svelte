@@ -20,7 +20,7 @@
 				node.dispatchEvent(new CustomEvent('clickOutside', node));
 			}
 		};
-		parent.addEventListener('click', handleClick, true);
+		let z = parent.addEventListener('click', handleClick, true);
 		return {
 			destroy() {
 				parent.removeEventListener('click', handleClick, true);
@@ -33,6 +33,7 @@
 	<div
 		class="oc"
 		class:open
+		aria-expanded={open}
 		use:clickOutside
 		on:clickOutside={() => {
 			if (open) toggle();
@@ -56,6 +57,7 @@
 	}
 
 	.oc {
+		z-index: 2;
 		position: absolute;
 		height: 100%;
 		flex: 0 1 auto;
@@ -76,6 +78,7 @@
 	}
 
 	.content {
+		z-index: 1;
 		flex: 1 1 auto;
 		overflow: auto;
 	}
