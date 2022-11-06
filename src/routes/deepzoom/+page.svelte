@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	let OpenSeadragon: Object;
-	let elView: HTMLElement;
 	onMount(async () => {
 		OpenSeadragon = await import('openseadragon');
-		var viewer = new OpenSeadragon.Viewer({
+
+		// http://openseadragon.github.io/docs/OpenSeadragon.html#.Options
+		new OpenSeadragon.Viewer({
 			id: 'viewer',
 			tileSources: 'img/deepzoom/peardice/output.dzi',
 			alwaysBlend: false,
