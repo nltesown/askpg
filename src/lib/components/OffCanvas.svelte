@@ -1,7 +1,18 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
-	export let open = false;
+	export let open = false; // Currrent visibility of the off-canvas element.
+	export let opts = {
+		alwaysOpen: false,
+		push: false, // Experimental: the off-canvas pushes the content.
+		overlay: false // Adds an overlay over the content (prevents interaction).
+	};
+
+	if (opts.alwaysOpen === true) open = true;
+
+	$: {
+		if (opts.alwaysOpen === true && open == false) open = true;
+	}
 
 	function toggle() {
 		open = !open;
@@ -46,8 +57,9 @@
 	>
 		<slot name="offcanvas" />
 	</div>
-	<div class="content">
-		<slot name="content" />
+	<div class="rest" class:open class:push={opts.push} class:use-overlay={opts.overlay}>
+		<div class="overlay" class:open class:use-overlay={opts.overlay} />
+		<slot />
 	</div>
 </div>
 
@@ -58,6 +70,7 @@
 		flex-direction: row;
 		align-items: stretch;
 		height: 100%;
+		max-height: 100vh; /* Important pour les cas où le component n'est pas placé dans un conteneur dimensionné. */
 		overflow: hidden;
 	}
 
@@ -82,10 +95,47 @@
 		transform: translateX(0);
 	}
 
-	.content {
+	.rest {
+		position: relative;
 		z-index: 1;
 		flex: 1 1 auto;
 		overflow: auto;
+	}
+
+	/* Can be moved to .rest */
+	.rest.push {
+		transform: translateX(0);
+		transition-timing-function: ease-in-out;
+		transition-duration: var(--duration, 0.1s);
+	}
+
+	/* TODO: We need to get the width of the off-canvas element */
+	/*
+  .rest.push.open {
+		transform: translateX(452.8px);
+	}
+  */
+
+	.rest.use-overlay.open {
+		overflow: hidden;
+	}
+
+	/* TODO: Make customizable */
+	.overlay {
+		z-index: 3;
+		position: absolute;
+		top: 0;
+		right: 0;
+		height: 100%;
+		left: 0;
+		background-color: #0006;
+		display: none;
+		opacity: 0;
+	}
+
+	.overlay.use-overlay.open {
+		display: block;
+		opacity: 1;
 	}
 
 	@media (max-width: 575px) {

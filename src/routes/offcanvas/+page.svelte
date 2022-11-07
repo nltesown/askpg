@@ -16,6 +16,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Off-canvas demo</title>
+</svelte:head>
+
 <div class="container">
 	<button class="icon menu-ctrl" on:click={toggle}>
 		{#if open === true}
@@ -26,13 +30,16 @@
 			open = e.detail.open;
 		}}
 		{open}
+		opts={{ alwaysOpen: false, push: false, overlay: false }}
 		--bg-color={color}
 		--duration="0.15s"
 	>
 		<div class="offcanvas" slot="offcanvas">
-			<p>The menu</p>
+			<h2>The menu</h2>
+			<p>This is your menu.</p>
 		</div>
-		<main class="content" slot="content">
+		<main class="content">
+			<!-- <main class="content" slot="content"> -->
 			<article>
 				<h1>The content</h1>
 				<p>
@@ -53,8 +60,9 @@
 							openSecondary = e.detail.open;
 						}}
 						open={openSecondary}
+						opts={{ alwaysOpen: false, push: false, overlay: true }}
 						--bg-color="pink"
-						--duration=".75s"
+						--duration=".5s"
 					>
 						<div slot="offcanvas">
 							<h2>What's here ?</h2>
@@ -74,7 +82,7 @@
 							<p>A noise.</p>
 							<p>An omelette.</p>
 						</div>
-						<div slot="content">About us.</div>
+						<div>About us.</div>
 					</OffCanvas>
 				</div>
 
