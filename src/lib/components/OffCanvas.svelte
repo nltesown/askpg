@@ -5,7 +5,10 @@
 
 	function toggle() {
 		open = !open;
-		dispatch('change', { open });
+		// The value of the prop `open` has changed from within the component.
+		// The new value is dispatched so it can be updated in the parent:
+		// `<OffCanvas on:visibilityChange={(e) => { open = e.detail.open; }}>...</OffCanvas>`
+		dispatch('visibilityChange', { open });
 	}
 
 	function clickOutside(node) {
@@ -20,7 +23,7 @@
 				node.dispatchEvent(new CustomEvent('clickOutside', node));
 			}
 		};
-		let z = parent.addEventListener('click', handleClick, true);
+		parent.addEventListener('click', handleClick, true);
 		return {
 			destroy() {
 				parent.removeEventListener('click', handleClick, true);
@@ -38,6 +41,8 @@
 		on:clickOutside={() => {
 			if (open) toggle();
 		}}
+		on:transitionstart={() => {}}
+		on:transitionend={() => {}}
 	>
 		<slot name="offcanvas" />
 	</div>
@@ -63,14 +68,14 @@
 		flex: 0 1 auto;
 		width: auto;
 		transform: translateX(-100%);
+		transition-timing-function: ease-in-out;
 		overflow: auto;
-
 		/* Customizable styling */
-		background-color: var(--bg-color, #ccc);
+		background-color: var(--bg-color, #eee);
 		min-width: var(--min-width, 30%);
-		max-width: var(--max-width, 90%);
+		max-width: var(--max-width, 80%);
 		scrollbar-width: var(--scrollbar, thin);
-		transition: var(--transition, 0.2s ease-in-out);
+		transition-duration: var(--duration, 0.1s);
 	}
 
 	.oc.open {
@@ -81,5 +86,11 @@
 		z-index: 1;
 		flex: 1 1 auto;
 		overflow: auto;
+	}
+
+	@media (max-width: 575px) {
+		.oc {
+			min-width: var(--min-width-small, 80%);
+		}
 	}
 </style>

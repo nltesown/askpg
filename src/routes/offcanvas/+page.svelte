@@ -4,10 +4,8 @@
 	import Close from '$lib/components/icons/IconClose.svelte';
 
 	let open = true;
-	let color = null;
-	// let color = '#ccc';
-
 	let openSecondary = true;
+	let color = '#eee';
 
 	function toggle() {
 		open = !open;
@@ -19,13 +17,17 @@
 </script>
 
 <div class="container">
+	<button class="icon menu-ctrl" on:click={toggle}>
+		{#if open === true}
+			<Close />{:else}<Menu />{/if}
+	</button>
 	<OffCanvas
-		on:change={(e) => {
+		on:visibilityChange={(e) => {
 			open = e.detail.open;
 		}}
 		{open}
 		--bg-color={color}
-		--transition="0.2s ease-in-out"
+		--duration="0.15s"
 	>
 		<div class="offcanvas" slot="offcanvas">
 			<p>The menu</p>
@@ -47,11 +49,12 @@
 
 				<div data-prevent-auto-close="true" class="inner-container">
 					<OffCanvas
-						on:change={(e) => {
+						on:visibilityChange={(e) => {
 							openSecondary = e.detail.open;
 						}}
 						open={openSecondary}
 						--bg-color="pink"
+						--duration=".75s"
 					>
 						<div slot="offcanvas">
 							<h2>What's here ?</h2>
@@ -81,11 +84,6 @@
 			</article>
 		</main>
 	</OffCanvas>
-
-	<div class="menu-ctrl" on:click={toggle}>
-		{#if open === true}
-			<Close />{:else}<Menu />{/if}
-	</div>
 </div>
 
 <style>
@@ -117,24 +115,34 @@
 		height: 2000px;
 	}
 
-	.menu-ctrl {
-		position: fixed;
-		top: 4px;
-		left: 4px;
-		width: 36px;
-		z-index: 1000;
-		cursor: pointer;
-	}
-
 	article {
 		width: 100%;
 		max-width: 700px;
+		padding: 24px;
 		margin: 24px auto;
+		box-sizing: border-box;
 	}
 
 	.inner-container {
 		margin: 24px;
 		height: 300px;
 		background-color: #9cf;
+	}
+
+	button.icon {
+		display: block;
+		width: 36px;
+		height: 36px;
+		border: none;
+		padding: 0;
+		background-color: transparent;
+		cursor: pointer;
+	}
+
+	.menu-ctrl {
+		position: fixed;
+		top: 4px;
+		left: 4px;
+		z-index: 1000;
 	}
 </style>
