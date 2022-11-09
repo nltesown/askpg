@@ -14,12 +14,30 @@
 		if (opts.alwaysOpen === true && open == false) open = true;
 	}
 
-	function toggle() {
-		open = !open;
+	/**
+	 * toggle
+	 * Toggle the state (opened/closed) of the off-canvas widget.
+	 * @param targetState {boolean?} Optional: specify if the widget must be closed (true) or opened (false).
+	 */
+	function toggle(targetState) {
+		if (targetState) {
+			open = !!targetState;
+		} else {
+			open = !open;
+		}
 		// The value of the prop `open` has changed from within the component.
 		// The new value is dispatched so it can be updated in the parent:
 		// `<OffCanvas on:visibilityChange={(e) => { open = e.detail.open; }}>...</OffCanvas>`
 		dispatch('visibilityChange', { open });
+	}
+
+	function conditionalClose(e) {
+		if (
+			(e.target.dataset.closeOffCanvas !== undefined || !!e.target.dataset.closeOffCanvas) &&
+			e.target.dataset.closeOffCanvas !== 'false' &&
+			e.target.dataset.closeOffCanvas !== '0'
+		)
+			toggle(false);
 	}
 
 	function clickOutside(node) {
@@ -52,6 +70,7 @@
 		on:clickOutside={() => {
 			if (open) toggle();
 		}}
+		on:click={conditionalClose}
 		on:transitionstart={() => {}}
 		on:transitionend={() => {}}
 	>
