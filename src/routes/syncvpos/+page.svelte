@@ -24,24 +24,26 @@
 </script>
 
 <div class="container">
-	<div class="col overflow" on:scroll={scroll} bind:this={elCol0}>
-		{#each content[0] as row, j}
-			<div style="height:{row}px;" class="row">{j}</div>
-		{/each}
-	</div>
-	<div class="col">
-		{#each content[1] as row, j}
-			<div style="height:{row}px;" class="row">{j}</div>
-		{/each}
-	</div>
-	<div class="col">
-		{#each content[2] as row, j}
-			<div style="height:{row}px;" class="row">{j}</div>
-		{/each}
-	</div>
-</div>
+	<main>
+		<div class="col overflow" on:scroll={scroll} bind:this={elCol0}>
+			{#each content[0] as row, j}
+				<div style="height:{row}px;" class="row">{j}</div>
+			{/each}
+		</div>
+		<div class="col">
+			{#each content[1] as row, j}
+				<div style="height:{row}px;" class="row">{j}</div>
+			{/each}
+		</div>
+		<div class="col">
+			{#each content[2] as row, j}
+				<div style="height:{row}px;" class="row">{j}</div>
+			{/each}
+		</div>
+	</main>
 
-<div>Se caler sur la hauteur de la première ligne dont l'intitulé est visible : {currentRow}</div>
+	<div>Se caler sur la hauteur de la première ligne dont l'intitulé est visible : {currentRow}</div>
+</div>
 
 <style>
 	:global(body) {
@@ -50,13 +52,19 @@
 	}
 
 	.container {
+		max-width: 700px;
+		width: 95%;
+		margin: 0 auto;
+	}
+
+	main {
 		display: flex;
 		flex-direction: row;
 		flex-wrap: nowrap;
 		justify-content: flex-start;
 		align-items: stretch;
 		margin: 48px auto;
-		width: 1000px;
+		/* width: 1000px; */
 		height: 50vh;
 		outline: solid 2px red;
 		overflow: auto;
