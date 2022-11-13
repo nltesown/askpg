@@ -12,21 +12,33 @@
 	];
 
 	let current;
+	let day;
+
+	let primary;
 	let secondary;
 
+	function align() {
+		let secondaryH = 0;
+		for (let secondaryDay of secondary.childNodes) {
+			if (secondaryDay.dataset.day === day) break;
+			secondaryH = secondaryH + secondaryDay.offsetHeight; // Position verticale du haut de la boîte du jour correspondant.
+		}
+		secondary.scrollTo(0, secondaryH - current.offsetTop + primary.scrollTop);
+	}
+
 	function inter(root) {
+		// NB: root est identique à primary, car c'est le paramètre passé à l'appel de la directive use:
+		// TODO: Comme on a besoin de primary par ailleurs, on peut se passer de l'appel de use:. Appeler cette fonction dans onMount.
 		let elems = root.childNodes;
 
 		const observer = new IntersectionObserver(
 			(entries) => {
 				const scrollY = root.scrollTop;
-				let h = 1;
+				let h = 0;
 				for (let elem of elems) {
-					if (h > scrollY) {
+					if (h >= scrollY) {
 						current = elem;
-						// TODO: position en utilisant current.getBoundingClientRect pour obtenir la position y de l'élement par rapport au viewport, et calculer le scroll à appliquer à l'élément secondaire pour arriver à la même position.
-						secondary.scrollTo(0, h);
-						// secondary.scrollTo(0, h - elem.offsetHeight + entries[0].boundingClientRect.top);
+						day = current.dataset.day;
 						break;
 					}
 					h = h + elem.offsetHeight;
@@ -39,55 +51,21 @@
 			observer.observe(elem);
 		}
 	}
-
-	/*
-  let previousY = 0;
-	let current = [];
-	let dir;
-
-	function inter(root) {
-		const observer = new IntersectionObserver(
-			(entries, observer) => {
-				for (let entry of entries) {
-					let day = entry.target.dataset.day;
-					let ratio = entry.intersectionRatio;
-					let y = entry.boundingClientRect.y;
-
-					if (ratio > 0) {
-						let dir = y > previousY;
-						console.log([day, ratio, y, dir]);
-						if (current.indexOf(day) < 0) {
-							current = current.concat([day]);
-						} else {
-							if (ratio < 1) current = current.filter((i) => i !== day);
-						}
-						previousY = y;
-					}
-				}
-			},
-			{
-				root,
-				rootMargin: '0px',
-				threshold: 0
-			}
-		);
-
-		for (let elDay of root.childNodes) {
-			observer.observe(elDay);
-		}
-	}
-*/
 </script>
 
-{current?.dataset.day}
+<div class="container menu">
+	<div>{day}</div>
+	<div><button on:click={align}>Align</button></div>
+</div>
+
 <div class="container">
-	<div class="week overflow" use:inter>
+	<div class="week overflow" use:inter bind:this={primary}>
 		{#each days as day}
 			<div class="day" data-day={day[0]} style="background-color:{day[1]};">{day[0]}</div>
 		{/each}
 	</div>
 
-	<div class="week" bind:this={secondary}>
+	<div class="week secondary" bind:this={secondary}>
 		{#each days as day}
 			<div class="day" data-day={day[0]} style="background-color:{day[1]};">{day[0]}</div>
 		{/each}
@@ -110,6 +88,14 @@
 		margin: 24px auto;
 	}
 
+	.menu > * {
+		font-size: 1.125rem;
+		font-weight: 600;
+		flex: 0 0 4rem;
+		padding: 0 4px;
+		/* text-align: center; */
+	}
+
 	.week {
 		flex: 1 1 auto;
 		position: relative;
@@ -126,5 +112,9 @@
 		height: 180px;
 		padding: 6px;
 		font-weight: 500;
+	}
+
+	.secondary > .day {
+		height: 240px;
 	}
 </style>
