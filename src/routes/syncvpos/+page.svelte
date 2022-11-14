@@ -1,88 +1,138 @@
 <script>
-	import { onMount } from 'svelte';
-	import _ from 'lodash';
+  import { onMount } from "svelte";
+  import _ from "lodash";
 
-	let content = [
-		[300, 350, 400, 200, 350, 450, 200, 550],
-		[200, 50, 80, 120, 200, 180, 220, 150],
-		[350, 200, 150, 240, 500, 100, 150, 60]
-	];
+  let days = [
+    ["Lundi", "#639"],
+    ["Mardi", "#693"],
+    ["Mercredi", "#369"],
+    ["Jeudi", "#396"],
+    ["Vendredi", "#936"],
+    ["Samedi", "#963"],
+    ["Dimanche", "#fc0"]
+  ];
+  let elCols = [];
+  let elSourceCol;
+  let elFocused; // Cellule de la colonne source en évidence.
+  let dayFocused = ""; // Nom du jour qui sert de référence pour l'alignement.
 
-	let elCol0;
-	let scrollableColRows = [];
-	let rowsOffset;
-	let currentRow = 0;
+  onMount(() => {
+    elSourceCol = elCols[1];
+    let obs = setObserver(elSourceCol);
+    // NB : pour déconnecter l'observer : obs.disconnect();
+  });
 
-	onMount(() => {
-		rowsOffset = Array.from(elCol0.querySelectorAll('.row')).map((r, i) => r.offsetTop); // offsetTop de chacune des rows de la colonne 0.
-	});
+  $: {
+    elFocused = elFocused;
+    if (elFocused) {
+      dayFocused = elFocused.dataset.day;
+    }
+  }
 
-	function scroll(e) {
-		let scrollY = elCol0.scrollTop;
-		currentRow = _(rowsOffset).findIndex((y) => y >= scrollY);
-	}
+  function setObserver(elCol) {
+    const elRows = elCol.children; // Cellules de la colonne source.
+    // let elFocused; // Cellule de la colonne source en évidence.
+
+    const observer = new IntersectionObserver(
+      () => {
+        const scrollY = elCol.scrollTop;
+        let i = 0; // Pointeur
+        for (let elRow of Array.from(elRows)) {
+          // L'itération s'arrête dès que l'on atteint une cellule dont le sommet est visible.
+          if (i >= scrollY) {
+            elFocused = elRow; // La cellule en évidence est la cellule courante.
+            break;
+          } else {
+            i = i + elRow.offsetHeight; // A chaque itération, le pointeur de position verticale `i` est augmenté de la hauteur de la cellule courante.
+          }
+        }
+      },
+      { elCol, rootMargin: "0px", threshold: 1 }
+    );
+
+    for (let elRow of Array.from(elRows)) {
+      observer.observe(elRow);
+    }
+
+    return observer; // Pour pouvoir le déconnecter ultérieurement (.disconnect).
+  }
+
+  function align() {
+    // On effectue l'alignement pour toutes les colonnes sauf la colonne source.
+    for (let elTargetCol of elCols.filter((c) => c !== elSourceCol)) {
+      let i = 0;
+      for (let elTargetRow of elTargetCol.children) {
+        if (elTargetRow.dataset.day === elFocused.dataset.day) break;
+        i = i + elTargetRow.offsetHeight; // Position verticale du haut de la boîte du jour correspondant.
+      }
+      elTargetCol.scrollTo(0, i - elFocused.offsetTop + elSourceCol.scrollTop);
+    }
+  }
 </script>
 
-<div class="container">
-	<main>
-		<div class="col overflow" on:scroll={scroll} bind:this={elCol0}>
-			{#each content[0] as row, j}
-				<div style="height:{row}px;" class="row">{j}</div>
-			{/each}
-		</div>
-		<div class="col">
-			{#each content[1] as row, j}
-				<div style="height:{row}px;" class="row">{j}</div>
-			{/each}
-		</div>
-		<div class="col">
-			{#each content[2] as row, j}
-				<div style="height:{row}px;" class="row">{j}</div>
-			{/each}
-		</div>
-	</main>
+<div class="container menu">
+  <div class="day-focused">{dayFocused}</div>
+  <div><button on:click={align}>Align</button></div>
+</div>
 
-	<div>Se caler sur la hauteur de la première ligne dont l'intitulé est visible : {currentRow}</div>
+<div class="container">
+  {#each [0, 1, 2] as _col, i}
+    <div class="week" class:overflow={elCols[i] === elSourceCol} bind:this={elCols[i]}>
+      {#each days as day}
+        <div
+          class="day"
+          data-day={day[0]}
+          style="background-color:{day[1]}; height: {Math.floor(Math.random() * 300) + 150}px;  "
+        >
+          {day[0]}
+        </div>
+      {/each}
+    </div>
+  {/each}
 </div>
 
 <style>
-	:global(body) {
-		margin: 0;
-		height: 80vh;
-	}
+  :global(body) {
+    margin: 0;
+    overflow: hidden;
+  }
 
-	.container {
-		max-width: 700px;
-		width: 95%;
-		margin: 0 auto;
-	}
+  .container {
+    display: flex;
+    flex-direction: row;
+    max-width: 700px;
+    width: 95%;
+    margin: 24px auto;
+  }
 
-	main {
-		display: flex;
-		flex-direction: row;
-		flex-wrap: nowrap;
-		justify-content: flex-start;
-		align-items: stretch;
-		margin: 48px auto;
-		/* width: 1000px; */
-		height: 50vh;
-		outline: solid 2px red;
-		overflow: auto;
-	}
+  .menu > * {
+    font-size: 1.125rem;
+    font-weight: 600;
+    flex: 0 0 25%;
+    padding: 0 4px;
+    text-align: left;
+  }
 
-	.col {
-		position: relative;
-		flex: 1 1 auto;
-		outline: solid 2px blue;
-		overflow: hidden;
-	}
+  .week {
+    flex: 1 1 auto;
+    position: relative;
+    height: 80vh;
+    scrollbar-width: thin;
+    overflow: hidden;
+    margin: 0 2px;
+  }
 
-	.overflow {
-		overflow: auto;
-	}
+  .overflow {
+    overflow: auto;
+  }
 
-	.row {
-		outline: solid 2px #0f0;
-		height: 36px;
-	}
+  .day {
+    height: 180px;
+    padding: 6px;
+    font-weight: 500;
+  }
+
+  .secondary > .day {
+    height: 240px;
+  }
 </style>
