@@ -2,10 +2,19 @@
   let i = 0;
 
   function setColumnObserver(elContainer) {
+    let wait = false; // Debounce flag.
     const observer = new IntersectionObserver(
-      (entries) => {
-        console.log(entries);
-        i++;
+      () => {
+        // Ici, on appellera l'alignement des colonnes (cf. syncvpos).
+        // Avec un délai de debounce.
+        if (wait === false) {
+          wait = true;
+          i++;
+          // TODO: appel.
+          setTimeout(() => {
+            wait = false;
+          }, 1000);
+        }
       },
       { elContainer, rootMargin: "-1px", threshold: 0 }
     );
