@@ -31,12 +31,14 @@
     height: 200vh;
     overflow: auto;
     scrollbar-width: thin;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
   }
 
   .week {
     flex: 0 0 25%;
     outline: solid 1px blue;
-    scroll-snap-type: x mandatory;
+    scroll-snap-align: start;
   }
 
   @media (max-width: 500px) {
