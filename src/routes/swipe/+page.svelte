@@ -7,13 +7,14 @@
       () => {
         // Ici, on appellera l'alignement des colonnes (cf. syncvpos).
         // Avec un délai de debounce.
+        // Ce délai peut être assez long (1000 ms OK ?) car pour qu'il soit pris en défaut, il faudrait que l'utilisateur ait le temps dans ce délai de swiper horizontalement (changement de colonne), puis verticalement (pour nécessiter de recalculer l'alignement).
         if (wait === false) {
           wait = true;
           i++;
           // TODO: appel.
           setTimeout(() => {
             wait = false;
-          }, 1000);
+          }, 750);
         }
       },
       { elContainer, rootMargin: "-1px", threshold: 0 }
