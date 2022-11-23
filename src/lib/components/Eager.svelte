@@ -8,15 +8,21 @@
   let lastY;
   let navY;
   let state = "initial";
+
   onMount(() => {
     elem.style.position = "relative";
     elem.style.width = "100%";
     parent = elem.parentNode;
     parent.style.position = "relative";
-    spacerElem = document.createElement("div");
-    spacerElem.style.position = "relative";
-    parent.insertBefore(spacerElem, elem);
-    // spacerElem.style.backgroundColor = 'red'; // Test
+
+    spacerElem = document.getElementById("eager-spacer"); // NOTE: l'élement existe déjà si le component a été monté précédemment.
+    if (spacerElem === null) {
+      spacerElem = document.createElement("div");
+      spacerElem.id = "eager-spacer";
+      spacerElem.style.position = "relative";
+      parent.insertBefore(spacerElem, elem);
+    }
+
     resize();
     transitionTo(state);
   });

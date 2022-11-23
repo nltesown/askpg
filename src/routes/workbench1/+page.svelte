@@ -2,18 +2,31 @@
   import IconAdjustments from "$lib/components/icons/IconAdjustments.svelte";
   import IconMenu from "$lib/components/icons/IconMenu.svelte";
   import IconFilter from "$lib/components/icons/IconFilter.svelte";
+  // import OffCanvas from "$lib/components/OffCanvas.svelte";
   import Eager from "$lib/components/Eager.svelte";
+
+  let open = false;
+
+  function toggle() {
+    console.log("Toggle!");
+    open = !open;
+  }
 </script>
 
 <Eager><nav /></Eager>
 
-<div class="container">And this is where it all began.</div>
+<div class="container">
+  <p>And this is where it all began.</p>
+  <p>Once upon a time there was.</p>
+</div>
 
 <div class="tools">
-  <button><IconMenu /></button>
+  <button on:click={toggle}><IconMenu /></button>
   <button><IconFilter /></button>
   <button><IconAdjustments /></button>
 </div>
+
+<div class="off-canvas" class:open />
 
 <style>
   :global(body) {
@@ -42,6 +55,7 @@
     align-items: center;
     width: 60px;
     outline: solid 1px red;
+    z-index: 1000;
   }
 
   button {
@@ -49,7 +63,7 @@
     flex: 0 0 auto;
     width: 60px;
     height: 60px;
-    padding: 12px;
+    padding: 14px;
     border: none;
     /* border-radius: 100px; */
     background-color: transparent;
@@ -66,10 +80,29 @@
     stroke: #000;
   }
 
+  .off-canvas {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    max-width: 70%;
+    width: 350px;
+    background-color: #fff;
+    transition: 0.15s;
+    transition-timing-function: ease-in-out;
+    transform: translateX(-100%);
+    z-index: 999;
+  }
+
+  .off-canvas.open {
+    transform: translateX(0);
+  }
+
   .container {
     width: 100%;
     max-width: 1000px;
     margin: 0 auto;
+    padding: 0 60px;
     outline: solid 1px red;
     min-height: 200vh;
   }
