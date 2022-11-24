@@ -31,6 +31,7 @@
     elem.style.position = "relative";
     h = elem.offsetHeight;
     elem.style.position = "fixed";
+    elem.style.zIndex = "5000";
     spacerElem.style.height = `${h}px`;
   }
 

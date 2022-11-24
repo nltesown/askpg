@@ -3,7 +3,7 @@
   import IconMenu from "$lib/components/icons/IconMenu.svelte";
   import IconFilter from "$lib/components/icons/IconFilter.svelte";
   // import OffCanvas from "$lib/components/OffCanvas.svelte";
-  // import Eager from "$lib/components/Eager.svelte";
+  import Eager from "$lib/components/Eager.svelte";
 
   let open = false;
 
@@ -13,8 +13,8 @@
   }
 </script>
 
-<nav />
-<!-- <Eager><nav /></Eager> -->
+<!-- <nav /> -->
+<Eager><nav /></Eager>
 
 <div class="container">
   <p>And this is where it all began.</p>
@@ -44,14 +44,14 @@
   nav {
     position: sticky;
     top: 0;
-    height: 60px;
+    height: 48px;
     background-color: #369;
     z-index: 2000;
   }
 
   .tools {
     position: fixed;
-    top: 61px;
+    top: 48px;
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
@@ -87,18 +87,18 @@
   /* Sur Firefox mobile, un bug décrit ici : https://stackoverflow.com/questions/67161825/what-is-the-problem-about-fixed-position-in-firefox-mobile */
   .off-canvas {
     position: fixed;
-    top: 61px;
-    /* bottom: 0; */
-    height: calc(100vh - 60px);
+    top: 0;
+    height: 100vh;
+    /* top: 48px;
+    height: calc(100vh - 49px); */
     left: 0;
-    max-width: 70%;
     width: 350px;
-    background-color: #fff;
+    max-width: 65%;
+    background-color: greenyellow;
     transition: 0.15s;
     transition-timing-function: ease-in-out;
     transform: translateX(-100%);
     z-index: 999;
-    outline: solid 2px red;
   }
 
   .off-canvas.open {
