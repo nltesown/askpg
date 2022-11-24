@@ -3,7 +3,7 @@
   import IconMenu from "$lib/components/icons/IconMenu.svelte";
   import IconFilter from "$lib/components/icons/IconFilter.svelte";
   // import OffCanvas from "$lib/components/OffCanvas.svelte";
-  import Eager from "$lib/components/Eager.svelte";
+  // import Eager from "$lib/components/Eager.svelte";
 
   let open = false;
 
@@ -13,7 +13,8 @@
   }
 </script>
 
-<Eager><nav /></Eager>
+<nav />
+<!-- <Eager><nav /></Eager> -->
 
 <div class="container">
   <p>And this is where it all began.</p>
@@ -41,13 +42,16 @@
   }
 
   nav {
+    position: sticky;
+    top: 0;
     height: 60px;
     background-color: #369;
+    z-index: 2000;
   }
 
   .tools {
     position: fixed;
-    top: 0;
+    top: 61px;
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
@@ -82,7 +86,7 @@
 
   .off-canvas {
     position: fixed;
-    top: 0;
+    top: 61px;
     bottom: 0;
     left: 0;
     max-width: 70%;
@@ -92,6 +96,7 @@
     transition-timing-function: ease-in-out;
     transform: translateX(-100%);
     z-index: 999;
+    outline: solid 2px red;
   }
 
   .off-canvas.open {

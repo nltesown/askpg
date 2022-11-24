@@ -12,3 +12,13 @@
 <ul>
   <li><a href="workbench1">Workbench1</a></li>
 </ul>
+
+<style>
+  hr {
+    width: 250px;
+    border: solid 0 #000;
+    border-bottom-width: 1px;
+    margin: 12px 0;
+    /* border-width: 0 0 1px 0; */
+  }
+</style>
