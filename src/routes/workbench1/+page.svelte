@@ -84,10 +84,12 @@
     stroke: #000;
   }
 
+  /* Sur Firefox mobile, un bug décrit ici : https://stackoverflow.com/questions/67161825/what-is-the-problem-about-fixed-position-in-firefox-mobile */
   .off-canvas {
     position: fixed;
     top: 61px;
-    bottom: 0;
+    /* bottom: 0; */
+    height: calc(100vh - 60px);
     left: 0;
     max-width: 70%;
     width: 350px;
