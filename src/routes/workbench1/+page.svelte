@@ -39,7 +39,7 @@
     background-size: 20px 20px;
     background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
     height: 300vh;
-    overflow-y: hidden;
+    overflow-x: hidden;
   }
 
   nav {
