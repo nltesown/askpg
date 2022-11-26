@@ -82,7 +82,8 @@
   }
 
   button:hover > :global(svg) {
-    stroke: #000;
+    /* stroke: #000; */
+    stroke: blue;
   }
 
   /* Sur Firefox mobile, un bug décrit ici : https://stackoverflow.com/questions/67161825/what-is-the-problem-about-fixed-position-in-firefox-mobile */

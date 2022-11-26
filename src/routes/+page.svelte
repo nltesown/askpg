@@ -7,18 +7,15 @@
   <li><a href="syncvpos">SyncVPos</a></li>
   <li><a href="swipe">Swipe</a></li>
   <li><a href="swipe">Eager</a></li>
-</ul>
-<hr />
-<ul>
   <li><a href="workbench1">Workbench1</a></li>
+  <li><a href="xstate">XState</a></li>
 </ul>
 
 <style>
-  hr {
+  /* hr {
     width: 250px;
     border: solid 0 #000;
     border-bottom-width: 1px;
     margin: 12px 0;
-    /* border-width: 0 0 1px 0; */
-  }
+  } */
 </style>
