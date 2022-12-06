@@ -38,7 +38,7 @@
     background-size: 20px 20px;
     background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
     height: 300vh;
-    overflow-y: hidden;
+    overflow-x: hidden;
   }
 
   nav {
@@ -81,7 +81,8 @@
   }
 
   button:hover > :global(svg) {
-    stroke: #000;
+    /* stroke: #000; */
+    stroke: blue;
   }
 
   /* Sur Firefox mobile, un bug décrit ici : https://stackoverflow.com/questions/67161825/what-is-the-problem-about-fixed-position-in-firefox-mobile */

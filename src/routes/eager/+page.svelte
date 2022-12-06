@@ -1,5 +1,6 @@
 <script>
   import Eager from "$lib/components/Eager.svelte";
+  import OffCanvas from "$lib/components/OffCanvas.svelte";
   import IconMenu from "$lib/components/icons/IconMenu.svelte";
 </script>
 
@@ -9,9 +10,10 @@
   </nav>
 </Eager>
 
-<div class="icon-menu"><IconMenu /></div>
-
 <div class="container" />
+
+<div class="icon-menu"><IconMenu /></div>
+<OffCanvas />
 
 <style>
   nav {
