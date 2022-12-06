@@ -9,6 +9,7 @@
   <li><a href="swipe">Eager</a></li>
   <li><a href="workbench1">Workbench1</a></li>
   <li><a href="xstate">XState</a></li>
+  <li><a href="checkboxlist">CheckboxList</a></li>
 </ul>
 
 <style>
