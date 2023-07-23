@@ -1,0 +1,8 @@
+@font-face {
+  font-display: swap;
+  font-family: "Popular";
+  font-style: normal;
+  font-weight: 600;
+  src: url("fonts/popular/popular-semibold.woff2") format("woff2"),
+    url("fonts/popular/popular-semibold.woff") format("woff");
+}

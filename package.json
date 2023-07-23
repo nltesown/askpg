@@ -32,6 +32,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@types/openseadragon": "^3.0.4",
 		"@xstate/svelte": "^2.0.0",
 		"lodash": "^4.17.21",
 		"openseadragon": "^3.1.0",
