@@ -8,7 +8,6 @@
   let open = false;
 
   function toggle() {
-    console.log("Toggle!");
     open = !open;
   }
 </script>
