@@ -4,6 +4,7 @@
   let OpenSeadragon: Object;
 
   const img = "spiaggia-2x";
+  const speed = 0.015;
 
   const pointsInitial = [
     [0.008, 0.46975],
@@ -104,14 +105,17 @@
       visibilityRatio: 1,
       zoomPerClick: 2,
       zoomPerScroll: 2,
-      animationTime: 15,
-      // animationTime: 2,
+      // animationTime: 15,
+      animationTime: 1,
       useCanvas: true,
       autoResize: true,
-      springStiffness: 0.00000001
+      springStiffness: 1
+      // springStiffness: 0.00000001
     });
 
     function getNextPoint() {
+      let dist;
+
       if (points.length === 0) points = pointsInitial;
 
       if (prevPoint) {
@@ -121,9 +125,11 @@
           .value();
 
         point = pointsByDistance[0][0];
+        dist = pointsByDistance[0][1];
         // point = pointsByDistance[_.random(1, 2, false)][0];
       } else {
         point = _.sample(points);
+        dist = 0.1; // TODO: calculer la distance réelle avec le centre du viewport.
       }
 
       // Enlève le point du tableau `points`.
@@ -135,30 +141,29 @@
 
       prevPoint = point;
 
-      return point;
+      return point.concat(dist);
     }
 
-    setTimeout(run, 2000);
+    setTimeout(run, 1000);
 
     const animationHandler = viewer.addHandler("animation-finish", () => {
-      setTimeout(run, 2000);
+      setTimeout(run, 1000);
     });
 
     function run() {
-      let [x, y] = getNextPoint();
+      let [x, y, d] = getNextPoint();
       let osdPoint = new OpenSeadragon.Point(x, y);
 
       zoomLevel =
         y > 0.47
-          ? _.random(9, 12, false)
+          ? _.random(8, 11, false)
           : y > 0.4
-          ? _.random(11, 15, false)
-          : _.random(14, 20, false);
+          ? _.random(12, 15, false)
+          : _.random(16, 24, false);
 
-      // TODO: définir la durée selon la distance à parcourir.
-      // viewer.viewport.centerSpringX.animationTime = 0.5;
-      // viewer.viewport.centerSpringY.animationTime = 0.5;
-      // viewer.viewport.zoomSpring.animationTime = 0.5;
+      viewer.viewport.centerSpringX.animationTime = d / speed;
+      viewer.viewport.centerSpringY.animationTime = d / speed;
+      viewer.viewport.zoomSpring.animationTime = d / speed;
 
       viewer.viewport.zoomTo(zoomLevel);
       viewer.viewport.panTo(osdPoint);
