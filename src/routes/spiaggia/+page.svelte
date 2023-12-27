@@ -17,6 +17,7 @@
   let prevPoint: Point;
   let point: Point;
   let points: Array<Point> = [];
+  let show_text: boolean = false;
 
   const points_initial: Array<Point> = [
     [0.033, 0.34075],
@@ -119,34 +120,36 @@
     let origin_point: Point = center_point;
     let target_point: Point; // Point cible de l'animation.
 
-    // points = _(points)
-    //   .flatMap((p) => [p, center_point])
-    //   .value();
-
     function animate() {
-      console.log("Animate");
-      console.log(points.length);
       let x: number, y: number;
 
       if (points.length > 0) {
-        if (isSamePoint(origin_point, center_point) === false) {
+        // De temps en temps, le point cible sera le point central.
+        if (isSamePoint(origin_point, center_point) === false && _.random(0, 6, false) === 1) {
           [x, y] = target_point = center_point;
         } else {
-          // Sélectionne le point cible.
-          [x, y] = target_point = _(points)
-            .orderBy((p) => distance(origin_point, p))
-            .value()[Math.min(points.length - 1, _.random(0, 1, false))];
+          // Choix du point cible suivant.
+          // Si on vient du point central, le point est choisi aléatoirement.
+          // Sinon, il est choisi par proximité avec le point de provenance.
+          if (isSamePoint(origin_point, center_point) === true) {
+            [x, y] = target_point = points[_.random(0, points.length - 1, false)];
+          } else {
+            [x, y] = target_point = _(points)
+              .orderBy((p) => distance(origin_point, p))
+              .value()[Math.min(points.length - 1, _.random(0, 1, false))];
+          }
 
           // Enlève le point cible du tableau `points`.
           points.splice(
-            _.findIndex(points, (p) => p[0] === target_point[0] && p[1] == target_point[1]),
+            _.findIndex(points, (p) => isSamePoint(p, target_point)),
+            // _.findIndex(points, (p) => p[0] === target_point[0] && p[1] == target_point[1]),
             1
           );
           points = points; // (Pour la réactivité).
         }
 
-        console.log(`origin: ${origin_point}`);
-        console.log(`target: ${target_point}`);
+        // console.log(`origin: ${origin_point}`);
+        // console.log(`target: ${target_point}`);
 
         // if (target_point && isSamePoint(origin_point, target_point)) {
         //   console.log("Same point");
@@ -158,12 +161,17 @@
         let d: number = distance(origin_point, target_point);
 
         let osdPoint = new OpenSeadragon.Point(x, y);
-        zoom_level =
-          y > 0.47
-            ? _.random(8, 11, false)
-            : y > 0.4
-            ? _.random(12, 15, false)
-            : _.random(16, 24, false);
+
+        if (isSamePoint(target_point, center_point)) {
+          zoom_level = 1;
+        } else {
+          zoom_level =
+            y > 0.47
+              ? _.random(8, 11, false)
+              : y > 0.4
+              ? _.random(12, 15, false)
+              : _.random(16, 24, false);
+        }
 
         viewer.viewport.centerSpringX.animationTime = d * speed;
         viewer.viewport.centerSpringY.animationTime = d * speed;
@@ -179,8 +187,9 @@
     }
 
     viewer.addHandler("animation-finish", () => {
-      console.log("Event animation-finish");
+      show_text = true;
       setTimeout(() => {
+        show_text = false;
         animate();
       }, pause);
     });
@@ -195,9 +204,9 @@
 
 <div id="viewer" />
 
-<!-- <div id="text-container">
-  <div id="text">Tu chi sei?</div>
-</div> -->
+<div class="text-container" class:visible={show_text}>
+  <div class="text">Tu chi sei?</div>
+</div>
 
 <div id="info">{zoom_level} {points.length}</div>
 
@@ -211,7 +220,7 @@
     inset: 0;
   }
 
-  #text-container {
+  .text-container {
     pointer-events: none;
     display: flex;
     flex-direction: row;
@@ -220,9 +229,14 @@
     align-items: center;
     position: absolute;
     inset: 0;
+    visibility: hidden;
   }
 
-  #text {
+  .visible {
+    visibility: visible;
+  }
+
+  .text {
     flex: 0 0 auto;
     font-size: 25vh;
     color: #fff;
