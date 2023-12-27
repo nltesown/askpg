@@ -1,16 +1,24 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import _ from "lodash";
-  let OpenSeadragon: Object;
+  // import type { Point } from "openseadragon";
 
-  const img = "spiaggia-2x";
-  const speed = 0.015;
+  type Point = [number, number];
 
-  const pointsInitial = [
-    [0.008, 0.46975],
-    [0.013, 0.4295],
-    [0.0145, 0.386],
-    [0.02625, 0.4065],
+  // Coordonnées d'un point (entre 0 et 1).
+  const img_src = "spiaggia-2x";
+  const speed = 100; // Valeur de vitesse (utilsée pour calculer la durée de chaque animation).
+  // const speed = 0.01; // Valeur de vitesse (utilsée pour calculer la durée de chaque animation).
+  const pause = 2000; // Pause (ms) après chaque animation.
+  const aspect_ratio = 4 / 3; // Ratio de l'image.
+  // const zoom_danger_zone = 0.9;
+
+  let zoom_level: number = 1;
+  let prevPoint: Point;
+  let point: Point;
+  let points: Array<Point> = [];
+
+  const points_initial: Array<Point> = [
     [0.033, 0.34075],
     [0.0445, 0.4445],
     [0.04675, 0.3905],
@@ -19,10 +27,8 @@
     [0.079, 0.363],
     [0.1105, 0.45875],
     [0.11675, 0.43125],
-    [0.14, 0.5815],
     [0.15425, 0.3855],
     [0.1555, 0.6365],
-    [0.15925, 0.532],
     [0.1615, 0.3475],
     [0.16375, 0.35525],
     [0.17375, 0.47575],
@@ -41,7 +47,6 @@
     [0.3395, 0.51],
     [0.349, 0.57025],
     [0.35725, 0.376],
-    [0.36275, 0.4445],
     [0.3835, 0.33425],
     [0.39775, 0.599],
     [0.42225, 0.53175],
@@ -50,7 +55,6 @@
     [0.49725, 0.467],
     [0.51175, 0.337],
     [0.51475, 0.60875],
-    [0.53075, 0.5455],
     [0.54, 0.46525],
     [0.54275, 0.37875],
     [0.5895, 0.5885],
@@ -66,31 +70,29 @@
     [0.80075, 0.39025],
     [0.8205, 0.475],
     [0.851, 0.43775],
-    [0.9085, 0.5745],
     [0.91625, 0.41425],
-    [0.94925, 0.693],
-    [0.9605, 0.6275],
-    [0.97475, 0.5515]
+    [0.94925, 0.693]
   ];
 
-  function distance(p1, p2) {
+  /**
+   * dist
+   * @param {Point} p1
+   * @param {Point} p2
+   * @returns {number} Distance entre les 2 points.
+   */
+  function distance(p1: Point, p2: Point): number {
     return Math.sqrt((p2[0] - p1[0]) ** 2 + (p2[1] - p1[1]) ** 2);
   }
 
-  let zoomLevel = 1;
-  let prevPoint;
-  let point;
-  let points = [];
-
   onMount(async () => {
-    OpenSeadragon = await import("openseadragon");
+    const OpenSeadragon = await import("openseadragon");
 
     // http://openseadragon.github.io/docs/OpenSeadragon.html#.Options
     // new OpenSeadragon.Viewer({
 
     const viewer = new OpenSeadragon.Viewer({
       id: "viewer",
-      tileSources: `img/deepzoom/${img}/output.dzi`,
+      tileSources: `img/deepzoom/${img_src}/output.dzi`,
       alwaysBlend: false,
       autoHideControls: true,
       wrapHorizontal: false,
@@ -105,75 +107,94 @@
       visibilityRatio: 1,
       zoomPerClick: 2,
       zoomPerScroll: 2,
-      // animationTime: 15,
       animationTime: 1,
       useCanvas: true,
       autoResize: true,
       springStiffness: 1
-      // springStiffness: 0.00000001
     });
 
-    function getNextPoint() {
-      let dist;
+    points = [...points_initial]; // Clone les points.
+    // let points: Array<Point> = _.take(_.shuffle([...points_initial]), 2); // Clone les points.
+    const center_point: Point = [0.5, 0.5 / aspect_ratio];
+    let origin_point: Point = center_point;
+    let target_point: Point; // Point cible de l'animation.
 
-      if (points.length === 0) points = pointsInitial;
+    // points = _(points)
+    //   .flatMap((p) => [p, center_point])
+    //   .value();
 
-      if (prevPoint) {
-        let pointsByDistance = _(points)
-          .map((p) => [p, distance(p, prevPoint)])
-          .orderBy((v) => v[1])
-          .value();
+    function animate() {
+      console.log("Animate");
+      console.log(points.length);
 
-        point = pointsByDistance[0][0];
-        dist = pointsByDistance[0][1];
-        // point = pointsByDistance[_.random(1, 2, false)][0];
+      if (points.length > 0) {
+        // Sélectionne le point cible.
+        let [x, y]: [number, number] = (target_point = _(points)
+          .orderBy((p) => distance(origin_point, p))
+          .value()[Math.min(points.length - 1, _.random(0, 1, false))]);
+
+        // Enlève le point cible du tableau `points`.
+        points.splice(
+          _.findIndex(points, (p) => p[0] === target_point[0] && p[1] == target_point[1]),
+          1
+        );
+        points = points; // (Pour la réactivité).
+
+        console.log(`origin: ${origin_point}`);
+        console.log(`target: ${target_point}`);
+
+        if (
+          target_point &&
+          target_point[0] === origin_point[0] &&
+          target_point[1] === origin_point[1]
+        ) {
+          console.log("Same point");
+          viewer.raiseEvent("animation-finish");
+          return;
+        }
+
+        // Distance entre les deux points.
+        let d: number = distance(origin_point, target_point);
+
+        let osdPoint = new OpenSeadragon.Point(x, y);
+        zoom_level =
+          y > 0.47
+            ? _.random(8, 11, false)
+            : y > 0.4
+            ? _.random(12, 15, false)
+            : _.random(16, 24, false);
+
+        viewer.viewport.centerSpringX.animationTime = d * speed;
+        viewer.viewport.centerSpringY.animationTime = d * speed;
+        viewer.viewport.zoomSpring.animationTime = d * speed;
+        viewer.viewport.zoomTo(zoom_level);
+        viewer.viewport.panTo(osdPoint);
+
+        origin_point = target_point;
       } else {
-        point = _.sample(points);
-        dist = 0.1; // TODO: calculer la distance réelle avec le centre du viewport.
+        viewer.removeAllHandlers("animation-finish");
+        console.log("End");
       }
-
-      // Enlève le point du tableau `points`.
-      let index = _.findIndex(points, (p) => _.isEqual(p, point));
-      if (index !== -1) {
-        points.splice(index, 1);
-        points = points;
-      }
-
-      prevPoint = point;
-
-      return point.concat(dist);
     }
 
-    setTimeout(run, 1000);
-
-    const animationHandler = viewer.addHandler("animation-finish", () => {
-      setTimeout(run, 1000);
+    viewer.addHandler("animation-finish", () => {
+      console.log("Event animation-finish");
+      setTimeout(() => {
+        animate();
+      }, pause);
     });
 
-    function run() {
-      let [x, y, d] = getNextPoint();
-      let osdPoint = new OpenSeadragon.Point(x, y);
-
-      zoomLevel =
-        y > 0.47
-          ? _.random(8, 11, false)
-          : y > 0.4
-          ? _.random(12, 15, false)
-          : _.random(16, 24, false);
-
-      viewer.viewport.centerSpringX.animationTime = d / speed;
-      viewer.viewport.centerSpringY.animationTime = d / speed;
-      viewer.viewport.zoomSpring.animationTime = d / speed;
-
-      viewer.viewport.zoomTo(zoomLevel);
-      viewer.viewport.panTo(osdPoint);
-    }
+    setTimeout(animate, 3000);
   });
 </script>
 
 <div id="viewer" />
 
-<div id="info">{zoomLevel} {points.length}</div>
+<!-- <div id="text-container">
+  <div id="text">Tu chi sei?</div>
+</div> -->
+
+<div id="info">{zoom_level} {points.length}</div>
 
 <style>
   #info {
@@ -183,5 +204,24 @@
   #viewer {
     position: absolute;
     inset: 0;
+  }
+
+  #text-container {
+    pointer-events: none;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    inset: 0;
+  }
+
+  #text {
+    flex: 0 0 auto;
+    font-size: 25vh;
+    color: #fff;
+    opacity: 0.9;
+    font-weight: 700;
   }
 </style>
