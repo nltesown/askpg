@@ -126,32 +126,33 @@
     function animate() {
       console.log("Animate");
       console.log(points.length);
+      let x: number, y: number;
 
       if (points.length > 0) {
-        // Sélectionne le point cible.
-        let [x, y]: [number, number] = (target_point = _(points)
-          .orderBy((p) => distance(origin_point, p))
-          .value()[Math.min(points.length - 1, _.random(0, 1, false))]);
+        if (isSamePoint(origin_point, center_point) === false) {
+          [x, y] = target_point = center_point;
+        } else {
+          // Sélectionne le point cible.
+          [x, y] = target_point = _(points)
+            .orderBy((p) => distance(origin_point, p))
+            .value()[Math.min(points.length - 1, _.random(0, 1, false))];
 
-        // Enlève le point cible du tableau `points`.
-        points.splice(
-          _.findIndex(points, (p) => p[0] === target_point[0] && p[1] == target_point[1]),
-          1
-        );
-        points = points; // (Pour la réactivité).
+          // Enlève le point cible du tableau `points`.
+          points.splice(
+            _.findIndex(points, (p) => p[0] === target_point[0] && p[1] == target_point[1]),
+            1
+          );
+          points = points; // (Pour la réactivité).
+        }
 
         console.log(`origin: ${origin_point}`);
         console.log(`target: ${target_point}`);
 
-        if (
-          target_point &&
-          target_point[0] === origin_point[0] &&
-          target_point[1] === origin_point[1]
-        ) {
-          console.log("Same point");
-          viewer.raiseEvent("animation-finish");
-          return;
-        }
+        // if (target_point && isSamePoint(origin_point, target_point)) {
+        //   console.log("Same point");
+        //   viewer.raiseEvent("animation-finish");
+        //   return;
+        // }
 
         // Distance entre les deux points.
         let d: number = distance(origin_point, target_point);
@@ -186,6 +187,10 @@
 
     setTimeout(animate, 3000);
   });
+
+  function isSamePoint(p1: Point, p2: Point): boolean {
+    return p1[0] === p2[0] && p1[1] === p2[1];
+  }
 </script>
 
 <div id="viewer" />
